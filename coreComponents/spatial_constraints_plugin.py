@@ -67,13 +67,15 @@ class SpatialConstraintsPlugin:
         print(f"[Info] Loading constraints from: {file_path}")
         functions = self.load_functions_from_file(file_path)
 
+        rules = []
         for name, func in functions:
             source = inspect.getsource(func)
             if not self.exists(name):
                 self.add_rule(name, source)
-            self.register(name, operation_name)
+            rules.append(name)
 
         print(f"[Info] Constraints registered for operation: {operation_name}")
+        return rules
 
     def load(self, operation_name):
         op_constraints_path = os.path.join(self.BASE_DIR, "operations", operation_name, "constraints.txt")

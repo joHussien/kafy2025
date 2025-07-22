@@ -4,7 +4,7 @@
 
 import os
 from coreComponents.transformers_plugin import TransformersPlugin
-from coreComponents.trajectory_plugin import TrajectoryPlugin
+# from coreComponents.trajectory_plugin import TrajectoryPlugin
 from coreComponents.spatial_constraints_plugin import SpatialConstraintsPlugin
 from coreComponents.operation_manager import OperationManager
 
@@ -20,17 +20,15 @@ def AddOperation(operation_name, transformer, operation_script, spatial_constrai
     logic = SpatialConstraintsPlugin.load_function_from_file(operation_script)
     if not hasattr(logic, 'operation_logic'):
         raise AttributeError("Operation script must contain a function named 'operation_logic'")
-    logic_fn = logic.operation_logic
-    TrajectoryPlugin.register(operation_name, logic_fn)
 
     rules = []
     if spatial_constraints is not None and os.path.exists(spatial_constraints):
-        rules = SpatialConstraintsPlugin.preprocess_constraints_file(
+        rules = SpatialConstraintsPlugin.process_constraints_file(
             constraints_file_path=spatial_constraints,
             operation_name=operation_name
         )
 
-    OperationManager.add_operation(operation_name, model, logic_fn, rules)
+    OperationManager.add_operation(operation_name, transformer, operation_script, rules)
     return f"Operation '{operation_name}' successfully added."
 
 # Optional CLI

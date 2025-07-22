@@ -30,7 +30,7 @@ class OperationManager:
         registry = self._load_registry()
         registry[operation_name] = {"logic_path": logic_fn,
                                     "model": model,
-                                    "rules": [] if rules is None else rules
+                                    "rules": rules
         }
 
         self._save_registry(registry)
