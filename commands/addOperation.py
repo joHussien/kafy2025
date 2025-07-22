@@ -6,10 +6,10 @@ import os
 from coreComponents.transformers_plugin import TransformersPlugin
 from coreComponents.trajectory_plugin import TrajectoryPlugin
 from coreComponents.spatial_constraints_plugin import SpatialConstraintsPlugin
-#from core.registry import Registry --> ??
+from coreComponents.operation_manager import OperationManager
 
 def AddOperation(operation_name, transformer, operation_script, spatial_constraints=None):
-    if Registry.exists(operation_name):
+    if OperationManager.exists(operation_name):
         return f"Operation '{operation_name}' already registered."
 
     # Load and register transformer model
@@ -30,7 +30,7 @@ def AddOperation(operation_name, transformer, operation_script, spatial_constrai
             operation_name=operation_name
         )
 
-    Registry.add(operation_name, model, logic_fn, rules)
+    OperationManager.add_operation(operation_name, model, logic_fn, rules)
     return f"Operation '{operation_name}' successfully added."
 
 # Optional CLI

@@ -1,0 +1,9 @@
+{
+    "operation1" : {"logic_path": "operations/classification/logic.py", 
+                    "model": "GPT", 
+                    "constraints": ["no_duplicate"]},
+
+    "operation2" : {"logic_path": "operations/classification/logic.py", 
+                    "model": "BERT", 
+                    "constraints": []}
+}
