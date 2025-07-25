@@ -14,3 +14,6 @@ def register(name, model):
 
 def get(name):
     return TRANSFORMERS.get(name)
+
+def exists(name):
+    return name in TRANSFORMERS

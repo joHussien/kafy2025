@@ -13,8 +13,8 @@ def AddOperation(operation_name, transformer, operation_script, spatial_constrai
         return f"Operation '{operation_name}' already registered."
 
     # Load and register transformer model
-    model = TransformersPlugin.load(transformer)
-    TransformersPlugin.register(operation_name, model)
+    if not TransformersPlugin.exists(transformer):
+        raise AttributeError("Transformer is not registered in the transformers plugin. Add Transformer first!")
 
     # Load and register operation logic
     logic = SpatialConstraintsPlugin.load_function_from_file(operation_script)
