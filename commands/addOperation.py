@@ -3,6 +3,7 @@
 # addOperation.py
 
 import os
+import json
 from coreComponents.transformers_plugin import TransformersPlugin
 # from coreComponents.trajectory_plugin import TrajectoryPlugin
 from coreComponents.spatial_constraints_plugin import SpatialConstraintsPlugin
@@ -23,10 +24,16 @@ def AddOperation(operation_name, transformer, operation_script, spatial_constrai
 
     rules = []
     if spatial_constraints is not None and os.path.exists(spatial_constraints):
-        rules = SpatialConstraintsPlugin.process_constraints_file(
-            constraints_file_path=spatial_constraints,
-            operation_name=operation_name
-        )
+        # TODO: Figure out the format. For now, assume it's a json list
+        with open(spatial_constraints, "r") as constraints_file:
+            constraints = json.load(constraints_file)
+        
+        for constraint in constraints:
+            if SpatialConstraintsPlugin.exists(constraint):
+                rules.append(constraint)
+            else:
+                raise AttributeError("Constraint \"" + constraint + "\" does not exist in constraints registry")
+
 
     OperationManager.add_operation(operation_name, transformer, operation_script, rules)
     return f"Operation '{operation_name}' successfully added."
