@@ -22,13 +22,13 @@ class OperationManager:
         registry = self._load_registry()
         return operation_name in registry
 
-    def add_operation(self, operation_name, model, logic_fn, rules):
+    def add_operation(self, operation_name, model, logic_path, rules):
         if self.exists(operation_name):
             print(f"[Info] Operation {operation_name} already defined in operations registry")
             return
         
         registry = self._load_registry()
-        registry[operation_name] = {"logic_path": logic_fn,
+        registry[operation_name] = {"logic_path": logic_path,
                                     "model": model,
                                     "rules": rules
         }
