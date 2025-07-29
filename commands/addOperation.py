@@ -18,7 +18,7 @@ def AddOperation(operation_name, transformer, operation_script, spatial_constrai
         raise AttributeError("Transformer is not registered in the transformers plugin. Add Transformer first!")
 
     # Load and register operation logic
-    logic = SpatialConstraintsPlugin.load_function_from_file(operation_script)
+    logic = SpatialConstraintsPlugin.load_functions_from_file(operation_script)
     if not hasattr(logic, 'operation_logic'):
         raise AttributeError("Operation script must contain a function named 'operation_logic'")
 
