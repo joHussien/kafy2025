@@ -1,4 +1,4 @@
 {
-    "no_duplicate": "constraintsLibrary.fullRules.no_duplicate",
-    "within_distance": "constraintsLibrary.fullRules.within_distance"
+    "no_duplicate": "constraintsLibrary/no_duplicate.py",
+    "within_distance": "constraintsLibrary/within_distance.py"
 }
