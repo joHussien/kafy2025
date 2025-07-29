@@ -28,19 +28,16 @@ class SpatialConstraintsPlugin:
         registry = self._load_registry()
         return function_name in registry
 
-    def add_rule(self, function_name, function_code):
-        with open(self.RULES_FILE, 'r') as f:
-            current_code = f.read()
-
-        if f"def {function_name}" in current_code:
-            print(f"[Info] Rule {function_name} already exists in fullRules.py")
-        else:
-            with open(self.RULES_FILE, 'a') as f:
-                f.write("\n\n" + function_code.strip())
-
+    def add_rule(self, function_name, function_path):
         registry = self._load_registry()
-        if function_name not in registry:
-            registry[function_name] = f"constraints_library.fullRules.{function_name}"
+        if function_name in registry:
+            print(f"[Info] Rule {function_name} already exists")
+        else:
+            logic = self.load_functions_from_file(function_path)
+            if not hasattr(logic, 'apply_constraint'):
+                raise AttributeError("Constraint script must contain a function named 'apply_constraint'")
+            
+            registry[function_name] = function_path
             self._save_registry(registry)
 
     def register(self, function_name, operation_name):
