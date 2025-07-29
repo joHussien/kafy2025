@@ -1,9 +1,9 @@
 import os
-from Partitioning import PartitioningModule
-from TransformersPlugin import TransformersPlugin
-from Tokenization import Tokenization
-from Training import start_training  # Assume you have a training function here
-from Registry import Registry
+from coreComponents.partitioning import PartitioningModule
+from coreComponents.transformers_plugin import TransformersPlugin
+from coreComponents.operation_manager import OperationManager
+from coreComponents.tokenization import Tokenization
+from coreComponents.training import start_training  # Assume you have a training function here
 
 def train_new_model(operation_name: str, dataset_path: str, training_args: dict):
     """
@@ -21,9 +21,9 @@ def train_new_model(operation_name: str, dataset_path: str, training_args: dict)
     # Compute MBR of trajectories
     location = partitioning.calculate_mbr_gps(trajectories)
     
-    # Get model instance from TransformerPlugin for this operation
-    model = TransformersPlugin.get_model(operation_name)
-    if model is None:
+    # Get model instance from OperationManager for this operation
+    model = OperationManager.get_model(operation_name)
+    if model is None or model is "":
         raise ValueError(f"No model registered for operation {operation_name}")
     
     # Tokenize dataset for training

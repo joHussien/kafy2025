@@ -35,3 +35,14 @@ class OperationManager:
 
         self._save_registry(registry)
 
+    def get_operation(self, operation_name):
+        registry = self._load_registry()
+        if operation_name in registry:
+            return registry[operation_name]
+        else:
+            raise ImportError(f"Operation {operation_name} not found in registry")
+    
+    def get_model(self, operation_name):
+        return self.get_operation(operation_name)["model"]
+
+
