@@ -55,6 +55,7 @@ class SpatialConstraintsPlugin:
                 f.write(function_name + "\n")
 
     def load_functions_from_file(self, file_path):
+        #TODO This should probably be moved to some kind of utility library
         spec = importlib.util.spec_from_file_location("custom_constraints", file_path)
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
@@ -94,6 +95,21 @@ class SpatialConstraintsPlugin:
             module_name, func_name = module_path.rsplit('.', 1)
             module = importlib.import_module(module_name)
             loaded_func = getattr(module, func_name)
+            loaded_functions.append(loaded_func)
+
+        return loaded_functions
+    
+    def load_rules(self, rules):
+        registry = self._load_registry()
+
+        loaded_functions = []
+        for fn in rules:
+            module_path = registry.get(fn)
+            if not module_path:
+                raise ImportError(f"Function {fn} not found in registry")
+            
+            logic = self.load_functions_from_file(module_path)
+            loaded_func = getattr(logic, "apply_constraint")
             loaded_functions.append(loaded_func)
 
         return loaded_functions
