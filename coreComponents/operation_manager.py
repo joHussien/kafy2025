@@ -46,9 +46,9 @@ class OperationManager:
         return self.get_operation(operation_name)["model"]
     
     def get_rules(self, operation_name):
-        return self.get_operation(operation_name)["rules"]
+        return self.get_operation(operation_name)["constraints"]
     
     def get_path(self, operation_name):
-        return self.get_operation(operation_name)["path"]
+        return self.get_operation(operation_name)["logic_path"]
 
 
