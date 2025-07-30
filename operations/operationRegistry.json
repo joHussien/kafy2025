@@ -1,9 +1,13 @@
 {
-    "operation1" : {"logic_path": "operations/classification/logic.py", 
+    "classification1" : {"logic_path": "operations/classification/logic.py", 
+                    "model": "BERT", 
+                    "constraints": []},
+
+    "classification2" : {"logic_path": "operations/classification/logic.py", 
                     "model": "GPT", 
                     "constraints": ["no_duplicate"]},
-
-    "operation2" : {"logic_path": "operations/classification/logic.py", 
-                    "model": "BERT", 
-                    "constraints": []}
+    
+    "generation"    : {"logic_path": "operations/generation/logic.py",
+                    "model": "BERT",
+                    "constraints": ["no_duplicate", "within_distance"]}
 }
