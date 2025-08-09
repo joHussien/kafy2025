@@ -11,7 +11,8 @@ from coreComponents.operation_manager import OperationManager
 
 def AddOperation(operation_name, transformer, operation_script, spatial_constraints=None):
     if OperationManager.exists(operation_name):
-        return f"Operation '{operation_name}' already registered."
+        print(f"Operation '{operation_name}' already registered.")
+        return None
 
     # Load and register transformer model
     if not TransformersPlugin.exists(transformer):
