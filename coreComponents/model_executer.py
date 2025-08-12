@@ -4,7 +4,7 @@ from typing import Any, Dict, List
 from shapely.geometry import Point
 import importlib.util
 import os
-from core.partitioning import PartitioningModule
+from coreComponents.partitioning import PartitioningModule
 
 class ModelExecutor:
     def __init__(self, project_path: str):
