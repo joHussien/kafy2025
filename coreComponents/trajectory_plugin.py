@@ -1,4 +1,5 @@
 import importlib.util
+from operation_manager import OperationManager
 import os
 
 class TrajectoryPlugin:
@@ -7,10 +8,10 @@ class TrajectoryPlugin:
         """
         Dynamically loads the run_operation function from the operation's logic.py file.
         """
-        logic_path = os.path.join("operations", operation_name, "logic.py")
+        logic_path = OperationManager.get_path(operation_name)
 
         if not os.path.exists(logic_path):
-            raise FileNotFoundError(f"No logic.py found for operation '{operation_name}'")
+            raise FileNotFoundError(f"No logic file found for operation '{operation_name}'")
 
         spec = importlib.util.spec_from_file_location("logic_module", logic_path)
         logic_module = importlib.util.module_from_spec(spec)
