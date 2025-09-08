@@ -2,7 +2,7 @@
 import json
 from commands.useOperation import use_operation
 # from commands.addOperation import add_operation
-# from commands.trainNewModel import train_new_model
+# from commands.trainNewModel import train_new_mode
 import os
 path = os.path.dirname(os.path.abspath(__file__))
 def print_menu():
