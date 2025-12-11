@@ -1,0 +1,13 @@
+# Prevent PyTorch model checkpoints
+*.pt
+*.pth
+*.pkl
+# Prevent Python cache directories and files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Remove the myfolder contents
+
+myfolder/

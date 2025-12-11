@@ -1,0 +1,5 @@
+{
+    "BART": "/export/scratch/husse408/speakingTrajectories/kafy2025/transformers/BART.py",
+    "T5": "/export/scratch/husse408/speakingTrajectories/kafy2025/transformers/T5.py",
+    "PEGASUS": "/export/scratch/husse408/speakingTrajectories/kafy2025/transformers/PEGASUS.py"
+}

@@ -1,6 +1,6 @@
 from coreComponents.spatial_constraints_plugin import SpatialConstraintsPlugin
 
-def AddOperation(rule_name, rule_script):
+def add_rule(rule_name, rule_script):
     if SpatialConstraintsPlugin.exists(rule_name):
         print(f"Rule '{rule_name}' already registered.")
         return None

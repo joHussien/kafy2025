@@ -1,70 +1,175 @@
-# Tokenization.py
+# coreComponents/tokenization.py
 
-import h3
-from shapely.geometry import Point
-from typing import List, Dict
+import re
+from datasets import Dataset, DatasetDict
 
-class Tokenization:
-    @staticmethod
-    def tokenize(points: List[Point], resolution: int) -> List[str]:
+# ----------------------------------------------------------
+# Geohash tokenizer (shared by ALL operations)
+# ----------------------------------------------------------
+class TrajectoryTokenizer:
+    """
+    Simple tokenizer that maps each geohash (or token) to an integer.
+    Uses whitespace splitting.
+    """
+
+    def __init__(self, resolution=8):
+        self.resolution = resolution
+        self.stoi = {
+            "<pad>": 0,
+            "<unk>": 1,
+            "<end>": 2,
+            '<|endoftext|>': 3,
+            'summarize:': 4
+        }
+        self.itos = {v: k for k, v in self.stoi.items()}
+        self.next_id = len(self.stoi)
+
+    def build_vocab(self, token_list):
         """
-        Converts a list of shapely.geometry.Point objects into H3 tokens at a specified resolution.
-
-        Args:
-            points (List[Point]): List of shapely.geometry.Point objects.
-            resolution (int): H3 resolution.
-
-        Returns:
-            List[str]: H3 tokens corresponding to the input points.
+        token_list is a list of geohash strings.
         """
-        return [h3.latlng_to_cell(point.y, point.x, resolution) for point in points]
-    @staticmethod
-    def is_spatial(result):
-        """
-        Checks whether the output of a model is a list of spatial tokens (e.g., H3).
-        Returns True if the result is likely to be spatial and should be detokenized.
-        """
-        if not isinstance(result, list) or len(result) == 0:
-            return False
+        unique = sorted(set(token_list))
+        for tok in unique:
+            if tok not in self.stoi:
+                self.stoi[tok] = self.next_id
+                self.itos[self.next_id] = tok
+                self.next_id += 1
 
-        # Case 1: result is a list of tokens, and each is a valid H3 index
-        if all(isinstance(token, str) and h3.h3_is_valid(token) for token in result):
-            return True
+    def encode(self, text):
+        tokens = text.split()
+        ids = []
+        for t in tokens:
+            ids.append(self.stoi.get(t, self.stoi["<unk>"]))
+        return ids
 
-        # (Optional) Add other token types in future
-        # e.g., check if tokens follow a grid ID pattern or are in a known registry
+    def decode(self, ids):
+        return " ".join(self.itos.get(i, "<unk>") for i in ids)
 
-        return False
+    def pad_token_id(self):
+        return self.stoi["<pad>"]
 
-    @staticmethod
-    def tokenize_dataset(dataset: List[List[Point]], resolution: int) -> List[List[str]]:
-        """
-        Converts a list of trajectories to H3 tokens.
+    def eos_token_id(self):
+        return self.stoi["<end>"]
+    def get_vocab_size(self):
+        return len(self.stoi)
 
-        Args:
-            dataset (List[List[Point]]): List of trajectories, each a list of Points.
-            resolution (int): H3 resolution.
+# ----------------------------------------------------------
+# Operation specific tokenizers
+# ----------------------------------------------------------
 
-        Returns:
-            List[List[str]]: Tokenized trajectories.
-        """
-        return [Tokenization.points2tokens(traj, resolution) for traj in dataset]
+def tokenize_summarization(df, tokenizer):
+    """
+    Input: original trajectory
+    Output: summary trajectory
+    """
 
-    @staticmethod
-    def from_geojson(geojson: Dict, resolution: int) -> List[List[str]]:
-        """
-        Converts a GeoJSON LineString dataset to tokenized form.
+    def map_fn(row):
+        inp = "summarize: " + row["trajectory"]
+        out = row["summary"]
 
-        Args:
-            geojson (Dict): GeoJSON-like dictionary of LineStrings.
-            resolution (int): H3 resolution.
+        return {
+            "input_ids": tokenizer.encode(inp),
+            "labels": tokenizer.encode(out),
+        }
 
-        Returns:
-            List[List[str]]: Tokenized trajectories.
-        """
-        tokenized = []
-        for feature in geojson["features"]:
-            coords = feature["geometry"]["coordinates"]
-            points = [Point(lon, lat) for lon, lat in coords]
-            tokenized.append(Tokenization.points2tokens(points, resolution))
-        return tokenized
+    ds = Dataset.from_pandas(df[["trajectory", "summary"]])
+    ds = ds.map(map_fn, remove_columns=["trajectory", "summary"])
+
+    return DatasetDict({
+        "train": ds,
+        "validation": ds,
+    })
+
+
+def tokenize_generation(df, tokenizer):
+    """
+    Input: trajectory
+    Output: same trajectory (LM-style training)
+    """
+
+    def map_fn(row):
+        ids = tokenizer.encode(row["trajectory"])
+        return {
+            "input_ids": ids,
+            "labels": ids,
+        }
+
+    ds = Dataset.from_pandas(df[["trajectory"]])
+    ds = ds.map(map_fn, remove_columns=["trajectory"])
+
+    return DatasetDict({
+        "train": ds,
+        "validation": ds,
+    })
+
+
+def tokenize_classification(df, tokenizer):
+    """
+    trajectory -> label
+    """
+
+    labels = sorted(df["label"].unique())
+    label_map = {lab: i for i, lab in enumerate(labels)}
+
+    def map_fn(row):
+        return {
+            "input_ids": tokenizer.encode(row["trajectory"]),
+            "labels": label_map[row["label"]],
+        }
+
+    ds = Dataset.from_pandas(df[["trajectory", "label"]])
+    ds = ds.map(map_fn, remove_columns=["trajectory", "label"])
+
+    return DatasetDict({
+        "train": ds,
+        "validation": ds,
+    })
+
+
+def tokenize_next_point(df, tokenizer):
+    """
+    input = trajectory up to last point  
+    label = last point
+    """
+
+    def map_fn(row):
+        pts = row["trajectory"].split()
+        if len(pts) < 2:
+            pts = ["<unk>", "<unk>"]
+
+        inp = " ".join(pts[:-1])
+        nxt = pts[-1]
+
+        return {
+            "input_ids": tokenizer.encode(inp),
+            "labels": tokenizer.encode(nxt),
+        }
+
+    ds = Dataset.from_pandas(df[["trajectory"]])
+    ds = ds.map(map_fn, remove_columns=["trajectory"])
+
+    return DatasetDict({
+        "train": ds,
+        "validation": ds,
+    })
+
+
+# ----------------------------------------------------------
+# Dispatcher used by AddOperation
+# ----------------------------------------------------------
+
+def tokenize_dataset(operation_type, df, tokenizer):
+
+    if operation_type == "summarization":
+        return tokenize_summarization(df, tokenizer)
+
+    if operation_type == "generation":
+        return tokenize_generation(df, tokenizer)
+
+    if operation_type == "classification":
+        return tokenize_classification(df, tokenizer)
+
+    if operation_type == "next_point":
+        return tokenize_next_point(df, tokenizer)
+
+    raise ValueError(f"Unknown operation type: {operation_type}")

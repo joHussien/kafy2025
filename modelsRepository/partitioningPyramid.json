@@ -8504,12 +8504,7 @@
                 -67.5
             ],
             "occupied": false,
-            "models": {
-                "generation": {
-                    "GPT": "/speakingTrajectories/KAFYFinalVersionJuly/modelsRepository/models/gpt_generation_model.pt",
-                    "BERT": "/speakingTrajectories/KAFYFinalVersionJuly/modelsRepository/models/gpt_generation_model.pt"
-                }
-            },
+            "models": {},
             "metadata": {},
             "num_tokens": 0
         },
@@ -12764,10 +12759,22 @@
                 101.25,
                 112.5
             ],
-            "occupied": false,
-            "models": {},
-            "metadata": {},
-            "num_tokens": 0
+            "occupied": true,
+            "models": {
+                "Summarization": {
+                    "Summarization_T5": "/export/scratch/husse408/speakingTrajectories/kafy2025/modelsRepository/Summarization/5_569/Summarization_T5.pt",
+                    "Summarization_BART": "/export/scratch/husse408/speakingTrajectories/kafy2025/modelsRepository/Summarization/5_569/Summarization_BART.pt",
+                    "Summarization_PEGASUS": "/export/scratch/husse408/speakingTrajectories/kafy2025/modelsRepository/Summarization/5_569/Summarization_PEGASUS.pt"
+                }
+            },
+            "metadata": {
+                "Summarization": [
+                    "Summarization_T5",
+                    "Summarization_BART",
+                    "Summarization_PEGASUS"
+                ]
+            },
+            "num_tokens": 6
         },
         "570": {
             "height": 5,
