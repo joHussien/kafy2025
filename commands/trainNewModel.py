@@ -33,6 +33,7 @@ def train_new_model(base_path,
     """
 
     PT = PartitioningModule(base_path)
+
      # ----------------------------------------------------------
     # 1. Load training CSV
     # ----------------------------------------------------------
@@ -56,15 +57,13 @@ def train_new_model(base_path,
     oplugin = TrajectoryOperationsPlugin(base_path)
     operation_data = oplugin.get(operation_name)
     registered_transformers = operation_data['transformers']
-    logging.info(f"Found Transformer(s) {registered_transformers}")
+    logging.info(f"For this operation, found Transformer(s) {registered_transformers}")
     for transformer in registered_transformers:
-        print("hello1")
         build_model_fn = tplugin.load_model_builder(transformer)
 
         if build_model_fn is None:
             logger.error(f"Transformer '{transformer}' not found.")
             raise ValueError(f"Transformer '{transformer}' not found.")
-        print("hello2")
         # ----------------------------------------------------------
         # 4. Make sure the operation already has this transformer (should be yes)
         # ----------------------------------------------------------
@@ -78,7 +77,6 @@ def train_new_model(base_path,
                 "Training aborted. Please add this transformer first to this operation."
             )
             return
-        print("hello3")
         # ----------------------------------------------------------
         # 6. Train this transformer model (common training logic)
         # ----------------------------------------------------------

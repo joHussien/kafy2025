@@ -10,8 +10,8 @@ from transformers import PreTrainedModel
 class TransformersPlugin:
     def __init__(self, base_path):
         self.base_path = base_path
-        self.registry_file = os.path.join(base_path, "transformers_registry.json")
         self.transformers_dir = os.path.join(base_path, "transformers")
+        self.registry_file = os.path.join(self.transformers_dir, "transformers_registry.json")
 
         os.makedirs(self.transformers_dir, exist_ok=True)
 

@@ -49,7 +49,8 @@ def add_operation(base_path,
     # 2. Check if operation already has this transformer
     # ----------------------------------------------------------
     oplugin = TrajectoryOperationsPlugin(base_path)
-    
+    # Before any training we need to make sure the operation script is valid
+    oplugin.validate_operation_script(operation_script,operation_name)
     # Function 1: Check if transformer already exists for this operation
     if oplugin.has_transformer(operation_name, transformer_name):
         logger.error(

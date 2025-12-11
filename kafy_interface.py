@@ -230,18 +230,18 @@ def interactive_loop():
                 # ----------------------------------------------------------
                 # script_name = os.path.basename(operation_script).lower()
 
-                # if "summar" in script_name:
-                #     op_type = "summarization"
-                # elif "class" in script_name:
-                #     op_type = "classification"
-                # elif "next" in script_name:
-                #     op_type = "next_point"
-                # elif "gen" in script_name:
-                #     op_type = "generation"
-                # else:
-                #     raise ValueError(f"Cannot infer operation type from script name: {script_name}")
+                if "summar" in operation_name.lower():
+                    op_type = "summarization"
+                elif "class" in operation_name.lower():
+                    op_type = "classification"
+                elif "next" in operation_name.lower():
+                    op_type = "next_point"
+                elif "gen" in operation_name.lower():
+                    op_type = "generation"
+                else:
+                    raise ValueError(f"Cannot infer operation type from script name: {operation_name.lower()}")
 
-                # args["operation"] = op_type
+                args["operation"] = op_type
                 train_new_model(
                     BASE_PATH,
                     operation_name,

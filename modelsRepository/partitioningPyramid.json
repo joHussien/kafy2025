@@ -12763,15 +12763,13 @@
             "models": {
                 "Summarization": {
                     "Summarization_T5": "/export/scratch/husse408/speakingTrajectories/kafy2025/modelsRepository/Summarization/5_569/Summarization_T5.pt",
-                    "Summarization_BART": "/export/scratch/husse408/speakingTrajectories/kafy2025/modelsRepository/Summarization/5_569/Summarization_BART.pt",
-                    "Summarization_PEGASUS": "/export/scratch/husse408/speakingTrajectories/kafy2025/modelsRepository/Summarization/5_569/Summarization_PEGASUS.pt"
+                    "Summarization_BART": "/export/scratch/husse408/speakingTrajectories/kafy2025/modelsRepository/Summarization/5_569/Summarization_BART.pt"
                 }
             },
             "metadata": {
                 "Summarization": [
                     "Summarization_T5",
-                    "Summarization_BART",
-                    "Summarization_PEGASUS"
+                    "Summarization_BART"
                 ]
             },
             "num_tokens": 6

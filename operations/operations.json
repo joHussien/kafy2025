@@ -1,0 +1,9 @@
+{
+    "Summarization": {
+        "transformers": [
+            "T5",
+            "BART"
+        ],
+        "script": "/export/scratch/husse408/speakingTrajectories/kafy2025/operations/Summarization.py"
+    }
+}

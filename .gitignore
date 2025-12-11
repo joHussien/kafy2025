@@ -9,5 +9,7 @@ __pycache__/
 *.pyd
 
 # Remove the myfolder contents
-
 myfolder/
+tmp/
+operations/
+transformers/
