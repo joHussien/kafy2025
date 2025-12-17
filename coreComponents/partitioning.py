@@ -65,7 +65,8 @@ class PartitioningModule:
 
         # 4. Get all models for this operation (returns a dict of model_name → path)
         operation_models = cell["models"][operation_name]
-        
+        if len(operation_models)>1:
+            logging.info(f"Found '{len(list(operation_models.keys()))}' transformer models for operation '{operation_name}' for this region '{list(operation_models.keys())}'")
         # For now, return the first model found (later we'll implement optimization)
         if not operation_models:
             raise ValueError(f"No models available for operation '{operation_name}' in this cell.")

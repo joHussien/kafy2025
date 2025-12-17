@@ -3,8 +3,13 @@
 import re
 from datasets import Dataset, DatasetDict
 
+
+
+
 # ----------------------------------------------------------
 # Geohash tokenizer (shared by ALL operations)
+# This will sever as both the trajectory tokenizer aka conver from GPS to h3 langauage
+# and also as the trasnformer tokenizer aka encode aka convert each unqiue geohash to a number
 # ----------------------------------------------------------
 class TrajectoryTokenizer:
     """

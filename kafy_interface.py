@@ -11,9 +11,9 @@ history = FileHistory(".kafy_history")
 
 
 from commands.addTransformer import add_transformer
-from commands.addOperation import add_operation
+from commands.addOperation2 import add_operation
 from commands.trainNewModel import train_new_model
-# from commands.runOperation import run_operation
+from commands.runOperation import run_operation
 BASE_PATH = os.path.dirname(os.path.abspath(__file__))
 command_completer = WordCompleter([
     "AddTransformer",
@@ -87,6 +87,46 @@ def parse_args_block(block):
 
     return args
 
+def parse_traj_plugin_input_block(block):
+    """
+    Example:
+        TrajPlugInput[count=20,max_length=100,...]
+
+    Returns:
+        {"count":20, "max_length":100,...}
+    """
+    if not block or not block.strip():
+        return {}
+    
+    block = block.strip()
+    
+    # Check if it's a valid TrajPlugInput block
+    if not block.startswith("TrajPlugInput[") or not block.endswith("]"):
+        # You could either return empty dict or raise error
+        # Option 1: Return empty dict for non-matching blocks
+        return {}
+        # Option 2: Raise error for malformed blocks
+        # raise ValueError(f"Malformed TrajPlugInput block: {block}")
+    
+    # Extract the inner content
+    inner = block[len("TrajPlugInput["):-1].strip()
+    
+    # Handle empty brackets: TrajPlugInput[]
+    if not inner:
+        return {}
+
+    args = {}
+    for pair in inner.split(","):
+        k, v = pair.split("=")
+
+        # auto-cast numeric values
+        if v.replace(".", "", 1).isdigit():
+            v = float(v) if "." in v else int(v)
+
+        args[k.strip()] = v
+
+    return args
+
 
 # ----------------------------------------------------------
 # Parsing user input
@@ -103,10 +143,8 @@ def parse_command(input_str):
         # special case args[...] stays intact
         if token.startswith("args[") and token.endswith("]"):
             flags["args_block"] = token
-
-        elif token.startswith("--"):
-            key, val = token[2:].split("=", 1)
-            flags[key] = val
+        elif token.startswith("TrajPlugInput[") and token.endswith("]"):
+            flags["traj_plugin_input_block"] = token
 
         else:
             positional.append(token)
@@ -131,7 +169,8 @@ def interactive_loop():
                 continue
 
             cmd, positional, flags = parse_command(user_input)
-
+            print(cmd)
+            print(positional)
             # ----------------------------------------------------------
             # AddTransformer TransformerName ImplementationFile
             # ----------------------------------------------------------
@@ -200,17 +239,13 @@ def interactive_loop():
             # TrainNewModel OperationName TrainingData [Args]
             # ----------------------------------------------------------
             elif cmd == "TrainNewModel":
-
-            #     if len(positional) < 2:
-            #         raise ValueError(
-            #             "Usage: TrainNewModel OperationName TrainingData"
-            #         )
-
+                print("hello2")
                 if len(positional) != 2:
                     raise ValueError(
                         "Usage: TrainNewModel OperationName TrainingData args[k=v,...]"
                     )
-                operation_name   = positional[0]
+                print("hello3")
+                operation_name = positional[0]
                 training_data = positional[1]
 
 
@@ -224,7 +259,7 @@ def interactive_loop():
 
                 args = parse_args_block(args_block)
 
-
+                print("hello4")
                 # ----------------------------------------------------------
                 # Infer operation type from script name
                 # ----------------------------------------------------------
@@ -250,28 +285,51 @@ def interactive_loop():
                 )
 
 
-            # # ----------------------------------------------------------
-            # # RunOperation OperationName InputData TrajPlugInput
-            # # ----------------------------------------------------------
-            # elif cmd == "RunOperation":
+            # ----------------------------------------------------------
+            # RunOperation OperationName InputData TrajPlugInput
+            # ----------------------------------------------------------
+            elif cmd == "RunOperation":
 
-            #     if len(positional) < 2:
-            #         raise ValueError(
-            #             "Usage: RunOperation OperationName InputData --TrajPlugInput='{}'"
-            #         )
+                if len(positional) != 2:
+                    raise ValueError(
+                        "Usage: RunOperation OperationName InputData TrajPlugInput[k=v,...]'"
+                    )
 
-            #     operation_name = positional[0]
-            #     partitioning_input = positional[1]
+                operation_name = positional[0]
+                training_data = positional[1]
 
-            #     trajplug_input = json.loads(flags["TrajPlugInput"])
 
-            #     run_operation(
-            #         BASE_PATH,
-            #         operation_name,
-            #         partitioning_input,
-            #         trajplug_input,
-            #     )
+                # ----------------------------------------------------------
+                # Parse the TrajPlugInput[...] block
+                # ----------------------------------------------------------
+                traj_plugin_input_block = flags.get("traj_plugin_input_block", None)
 
+                if traj_plugin_input_block is None:
+                    raise ValueError("Missing TrajPlugInput[...] block")
+                traj_plugin_input = parse_traj_plugin_input_block(traj_plugin_input_block)
+
+                # ----------------------------------------------------------
+                # Infer operation type from script name
+                # ----------------------------------------------------------
+
+                if "summar" in operation_name.lower():
+                    op_type = "summarization"
+                elif "class" in operation_name.lower():
+                    op_type = "classification"
+                elif "next" in operation_name.lower():
+                    op_type = "next_point"
+                elif "gen" in operation_name.lower():
+                    op_type = "generation"
+                else:
+                    raise ValueError(f"Cannot infer operation type from script name: {operation_name.lower()}")
+
+                traj_plugin_input["operation"] = op_type
+                run_operation(
+                    BASE_PATH,
+                    operation_name,
+                    training_data,
+                    traj_plugin_input,
+                    )
             else:
                 print(f"Unknown command: {cmd}")
 

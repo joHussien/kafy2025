@@ -85,6 +85,7 @@ def collate_fn(batch):
 def train_operation_model(build_model_fn,
                           tokenizer,
                           tokenized_dataset,
+                          collator,
                           args):
     """ 
     Common training pipeline for ALL operations.
@@ -126,7 +127,7 @@ def train_operation_model(build_model_fn,
         args=training_args,
         train_dataset=tokenized_dataset["train"],
         eval_dataset=tokenized_dataset["validation"],
-        data_collator=collate_fn,
+        data_collator=collator,
     )
 
     # ----------------------------------------------------------
