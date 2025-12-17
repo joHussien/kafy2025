@@ -14,12 +14,60 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(
 class UnexpectedError(Exception):
     def __init__(self, message="An unexpected error occurred. This should not happen."):
         super().__init__(message)
+def save_processed_dataset(df_processed, operation_type, save_path):
+    """Save the processed H3 dataset to CSV."""
+    # Create a copy with meaningful column names
+    df_to_save = df_processed.copy()
+    
+    # Rename columns for clarity
+    if operation_type == "summarization":
+        if "trajectory" in df_to_save.columns:
+            df_to_save = df_to_save.rename(columns={
+                "trajectory": "input_h3_trajectory",
+                "summary": "output_h3_summary"
+            })
+    elif operation_type == "generation":
+        if "trajectory" in df_to_save.columns:
+            df_to_save = df_to_save.rename(columns={
+                "trajectory": "h3_trajectory"
+            })
+    elif operation_type == "classification":
+        if "trajectory" in df_to_save.columns:
+            df_to_save = df_to_save.rename(columns={
+                "trajectory": "h3_trajectory"
+            })
+    elif operation_type == "next_point":
+        # For next_point, we need to split trajectories
+        rows = []
+        for idx, row in df_processed.iterrows():
+            if pd.isna(row["trajectory"]):
+                continue
+            
+            tokens = row["trajectory"].split()
+            if len(tokens) < 2:
+                continue
+            
+            input_traj = " ".join(tokens[:-1])
+            next_point = tokens[-1]
+            rows.append({
+                "input_h3_trajectory": input_traj,
+                "next_h3_point": next_point
+            })
+        df_to_save = pd.DataFrame(rows)
+    
+    # Save to CSV
+    df_to_save.to_csv(save_path, index=False)
+    logger.info(f"Processed H3 dataset saved to: {save_path}")
+    return df_to_save
+
 
 class PartitioningModule:
     def __init__(self, project_path):
         self.models_repo_path = os.path.join(project_path, "modelsRepository")
         self.config_file = os.path.join(project_path,  "modelsRepository","pyramidConfigs.json")
         self.pyramid_path = os.path.join(project_path,  "modelsRepository","partitioningPyramid.json")
+        self.trajectory_repo = os.path.join(project_path, "TrajectoryStore")
+        os.makedirs(self.trajectory_repo, exist_ok=True)
         self.pyramid = {}
         self.tokens_threshold_per_cell = 100
         os.makedirs(self.models_repo_path, exist_ok=True)
@@ -322,6 +370,47 @@ class PartitioningModule:
         pyramid_cell["num_tokens"] = num_tokens
         
         logging.info(f"Updated cell {cell_level}_{cell_index} with model {model_name} for operation {operation_name}")
+    def save_tokenized_dataset(self,tokenized_dataset, operation_name: str, 
+                original_data_path: str) -> str:
+        """
+        Save a trained model to the appropriate cell in the pyramid.
+        
+        Args:
+            model: The trained model object to save
+            operation_name (str): Name of the operation (e.g., 'classification')
+            model_name (str): Name/identifier for this specific model
+            training_trajectories_path (str): Path to CSV file with training trajectories
+            
+        Returns:
+            str: Path where the model was saved
+        """
+        # 1. Load training trajectories
+        trajectories = self.load_trajectories(original_data_path)
+        if not trajectories:
+            raise ValueError("No training trajectories found.")
+        
+        # 2. Find the enclosing cell
+        cell = self._find_enclosing_cell_of_trajectory_list(trajectories)
+        if not cell:
+            raise ValueError("No enclosing cell found for training trajectories.")
+        
+        # 3. Get cell path and create operation subdirectory
+        cell_level = cell["height"]
+        cell_index = cell["index"]
+        
+        # Create path: modelsRepository/operation_name/level_index/
+        tokenized_data_cell_path = os.path.join(
+            self.trajectory_repo, 
+            operation_name, 
+            f"{cell_level}_{cell_index}"
+        )
+        os.makedirs(tokenized_data_cell_path, exist_ok=True)
+        
+        # 4. Save the model
+        filename = "tokenized_data.csv"  # or .pt for PyTorch
+        data_path = os.path.join(tokenized_data_cell_path, filename)
+        tokenized_dataset.to_csv(data_path,index=False)
+        return data_path    
     def save_model(self, model, operation_name: str, model_name: str, 
                 training_trajectories_path: str) -> str:
         """

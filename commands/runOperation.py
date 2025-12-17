@@ -13,10 +13,10 @@ import torch
 import pickle
 
 from coreComponents.transformers_plugin import TransformersPlugin
-from coreComponents.tokenization import (
-    TrajectoryTokenizer,
-    tokenize_dataset,
-)
+# from coreComponents.tokenization import (
+#     TrajectoryTokenizer,
+#     tokenize_dataset,
+# )
 from coreComponents.trajectory_operations_plugin import TrajectoryOperationsPlugin
 from coreComponents.partitioning import PartitioningModule
 import logging

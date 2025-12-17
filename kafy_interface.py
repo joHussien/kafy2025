@@ -11,7 +11,7 @@ history = FileHistory(".kafy_history")
 
 
 from commands.addTransformer import add_transformer
-from commands.addOperation2 import add_operation
+from commands.addOperation import add_operation
 from commands.trainNewModel import train_new_model
 from commands.runOperation import run_operation
 BASE_PATH = os.path.dirname(os.path.abspath(__file__))
@@ -50,9 +50,9 @@ def print_menu():
     print("\nWelcome to KAFY Interactive CLI")
     print("Available commands:")
     print("  AddTransformer TransformerName ImplementationFile")
-    print("  AddOperation OperationName TransformerName TrainingData OperationScript [Args]")
-    print("  TrainNewModel OperationName TrainingData [Args]")
-    print("  RunOperation OperationName InputData TrajPlugInput")
+    print("  AddOperation OperationName TransformerName TrainingData OperationScript args[k=v,...]")
+    print("  TrainNewModel OperationName TrainingData args[k=v,...]")
+    print("  RunOperation OperationName InputData TrajPlugInput[k=v,...]")
     print("  Exit")
 
 
@@ -169,8 +169,6 @@ def interactive_loop():
                 continue
 
             cmd, positional, flags = parse_command(user_input)
-            print(cmd)
-            print(positional)
             # ----------------------------------------------------------
             # AddTransformer TransformerName ImplementationFile
             # ----------------------------------------------------------
@@ -239,12 +237,10 @@ def interactive_loop():
             # TrainNewModel OperationName TrainingData [Args]
             # ----------------------------------------------------------
             elif cmd == "TrainNewModel":
-                print("hello2")
                 if len(positional) != 2:
                     raise ValueError(
                         "Usage: TrainNewModel OperationName TrainingData args[k=v,...]"
                     )
-                print("hello3")
                 operation_name = positional[0]
                 training_data = positional[1]
 
@@ -258,8 +254,6 @@ def interactive_loop():
                     raise ValueError("Missing args[...] block")
 
                 args = parse_args_block(args_block)
-
-                print("hello4")
                 # ----------------------------------------------------------
                 # Infer operation type from script name
                 # ----------------------------------------------------------

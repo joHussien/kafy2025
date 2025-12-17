@@ -3,9 +3,20 @@
         "transformers": [
             "T5",
             "BART",
-            "CustomTransformer",
             "PEGASUS"
         ],
         "script": "/export/scratch/husse408/speakingTrajectories/kafy2025/operations/Summarization.py"
+    },
+    "Summarization2": {
+        "transformers": [
+            "PEGASUS"
+        ],
+        "script": "/export/scratch/husse408/speakingTrajectories/kafy2025/operations/Summarization2.py"
+    },
+    "Summarization3": {
+        "transformers": [
+            "PEGASUS"
+        ],
+        "script": "/export/scratch/husse408/speakingTrajectories/kafy2025/operations/Summarization3.py"
     }
 }
