@@ -1,2 +1,2 @@
-This should be the most recent version of kafy. I am implmenting this in July 2025 using the latest version of the paper.
-I should not start from scratch , rather reuse some components from older versions of KAFY and build upon them.
+This is the GitHub Repo for the paper "KAFY: An Extensible and Scalable Transformers-Based System for Trajectory Data Analysis" Youssef Hussein and Mohamed F. Mokbel.
+Paper under submission.
