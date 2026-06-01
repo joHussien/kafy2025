@@ -16,7 +16,7 @@ A ride-sharing dataset with 56K trajectories (56M GPS points) covering 500K km. 
   - Your institution
   - Your intended usage of the dataset
 - **Format:** Each trajectory is serialized as an Apache Parquet file. Each GPS ping includes a trajectory ID, latitude, longitude, timestamp (UTC), accuracy level, bearing, and speed, sampled at a 1-second rate. The full dataset is approximately 2 GB.
-- - **Citation:**
+-  **Citation:**
 ```bibtex
 @inproceedings{huang2019grabposisi,
   author    = {Huang, Xiaocheng and Yin, Yifang and Lim, Simon and Wang, Guanfeng and Hu, Bo and Varadarajan, Jagannadan and Zheng, Shonali and Bulusu, Ali and Zimmermann, Roger},
